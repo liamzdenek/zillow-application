@@ -16,6 +16,11 @@
 - Updated the memory bank with deployment details and troubleshooting procedures
 - Populated DynamoDB table with 500 sample agent records
 - Increased Lambda function timeout to 30 seconds and memory to 1024 MB
+- Fixed UI issues with filter components alignment
+- Fixed simulation endpoint URL in the frontend code
+- Added missing metrics to the simulation results
+- Fixed color highlighting in the simulation results
+- Improved navigation with button-styled links
 
 ## Active Decisions
 - Using AWS CDK for infrastructure as code
@@ -25,13 +30,14 @@
 - Using Lambda for serverless backend functionality
 
 ## Next Steps
-- Populate the DynamoDB table with sample data
 - Add more comprehensive error handling
 - Implement user authentication if required
 - Add more detailed metrics and visualizations
 - Add automated tests for the frontend and backend
 - Set up CI/CD pipeline for automated deployments
 - Implement monitoring and alerting for the application
+- Consider adding more interactive visualizations for the simulation results
+- Improve the mobile responsiveness of the dashboard
 
 ## Technical Considerations
 - Ensuring proper CORS configuration for API Gateway
@@ -42,3 +48,6 @@
 - Using the correct API paths with the /api prefix
 - Handling the TanStack Router API changes in version 1.114.15
 - Dynamically finding the git root directory for reliable file paths
+- Implementing different color highlighting logic for different types of metrics
+- Handling the case when no filter is selected in the UI
+- Understanding the subset of metrics returned by the simulation API

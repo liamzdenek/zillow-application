@@ -19,6 +19,9 @@ export default defineConfig({
     outDir: '../../dist/packages/frontend',
     emptyOutDir: true,
   },
+  define: {
+    'import.meta.env.VITE_API_BASE_URL': JSON.stringify('https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api')
+  },
   server: {
     port: 3000,
     proxy: {

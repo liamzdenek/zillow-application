@@ -15,7 +15,7 @@ export const SegmentFilter: React.FC = () => {
   if (loading) return <div className="animate-pulse h-10 bg-gray-200 rounded w-full"></div>;
 
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col justify-end h-full">
       <label htmlFor="segment-type" className="block text-sm font-medium text-gray-700 mb-1">
         Segment
       </label>

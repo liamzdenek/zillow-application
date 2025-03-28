@@ -8,41 +8,41 @@ import { SegmentFilter } from '../components/filters/SegmentFilter';
 import { ValueFilter } from '../components/filters/ValueFilter';
 import { InterventionSelector } from '../components/simulation/InterventionSelector';
 import { SimulationResults } from '../components/simulation/SimulationResults';
-import { ImpactVisualization } from '../components/simulation/ImpactVisualization';
 import { Link } from '@tanstack/react-router';
 
 export const Simulation: React.FC = () => {
-  const { segmentType, segmentValue, applyFilters } = useFilter();
+  const { pendingSegmentType, pendingSegmentValue, applyFilters } = useFilter();
   const [interventionType, setInterventionType] = useState<InterventionType | undefined>(undefined);
   const { interventions, loading: loadingInterventions } = useInterventions();
-  const { 
-    simulationResult, 
-    loading: loadingSimulation, 
+  const {
+    simulationResult,
+    loading: loadingSimulation,
     error,
     runSimulation,
     resetSimulation
   } = useSimulation();
 
   const handleSimulate = () => {
-    if (segmentType && segmentValue && interventionType) {
+    if (pendingSegmentType && pendingSegmentValue && interventionType) {
       applyFilters(); // Apply any pending filter changes
       runSimulation({
-        segmentType,
-        segmentValue,
+        segmentType: pendingSegmentType,
+        segmentValue: pendingSegmentValue,
         interventionType
       });
     }
   };
 
-  const canSimulate = !!segmentType && !!segmentValue && !!interventionType;
+  // For debugging
+  console.log('pendingSegmentType:', pendingSegmentType);
+  console.log('pendingSegmentValue:', pendingSegmentValue);
+  console.log('interventionType:', interventionType);
+  
+  const canSimulate = !!pendingSegmentType && !!pendingSegmentValue && !!interventionType;
 
   return (
     <>
       <div className="mb-6">
-        <Link to="/" className="text-zillow-blue hover:underline mb-4 inline-block">
-          &lt; Back to Dashboard
-        </Link>
-        
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Intervention Simulator</h1>
         
         <div className="bg-white p-4 rounded-lg shadow-md mb-6">
@@ -82,30 +82,29 @@ export const Simulation: React.FC = () => {
       )}
 
       {simulationResult && (
-        <>
-          <SimulationResults result={simulationResult} />
-          <ImpactVisualization result={simulationResult} />
-          
-          <div className="flex justify-between mt-8">
-            <button 
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-              onClick={resetSimulation}
-            >
-              Try Another Intervention
-            </button>
-            
-            <button 
-              className="px-4 py-2 bg-zillow-blue text-white rounded-md hover:bg-zillow-dark-blue"
-              onClick={() => {
-                // In a real implementation, this would export the results
-                alert('Export functionality would be implemented here');
-              }}
-            >
-              Export Results
-            </button>
-          </div>
-        </>
-      )}
+       <>
+         <SimulationResults result={simulationResult} />
+         
+         <div className="flex justify-between mt-8">
+           <button
+             className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+             onClick={resetSimulation}
+           >
+             Try Another Intervention
+           </button>
+           
+           <button
+             className="px-4 py-2 bg-zillow-blue text-white rounded-md hover:bg-zillow-dark-blue"
+             onClick={() => {
+               // In a real implementation, this would export the results
+               alert('Export functionality would be implemented here');
+             }}
+           >
+             Export Results
+           </button>
+         </div>
+       </>
+     )}
     </>
   );
 };

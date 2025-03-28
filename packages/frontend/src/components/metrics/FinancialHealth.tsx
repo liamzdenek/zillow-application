@@ -29,11 +29,6 @@ export const FinancialHealth: React.FC<FinancialHealthProps> = ({ metrics }) => 
         label="Lifetime Value"
         value={formatCurrency(metrics.lifetimeValue)}
       />
-      
-      {/* Placeholder for chart - in a real implementation, we would use Chart.js here */}
-      <div className="mt-4 h-40 bg-zillow-light-blue rounded flex items-center justify-center">
-        <span className="text-zillow-blue">Revenue Trend Chart</span>
-      </div>
     </MetricCard>
   );
 };

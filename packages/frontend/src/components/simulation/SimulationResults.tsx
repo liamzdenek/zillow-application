@@ -19,9 +19,16 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
     return `${value.toFixed(1)}%`;
   };
 
-  const calculateImpact = (current: number, projected: number) => {
+  // For metrics where higher is better (revenue, satisfaction, etc.)
+  const calculatePositiveImpact = (current: number, projected: number) => {
     const difference = projected - current;
     return difference > 0 ? 'up' : difference < 0 ? 'down' : 'neutral';
+  };
+
+  // For metrics where lower is better (churn, risk, etc.)
+  const calculateNegativeImpact = (current: number, projected: number) => {
+    const difference = projected - current;
+    return difference < 0 ? 'up' : difference > 0 ? 'down' : 'neutral';
   };
 
   const formatImpact = (current: number, projected: number) => {
@@ -49,7 +56,7 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Avg Revenue</div>
               <div>{formatCurrency(result.currentMetrics.financialHealth.averageRevenuePerAgent)}</div>
               <div>{formatCurrency(result.projectedMetrics.financialHealth.averageRevenuePerAgent)}</div>
-              <div className={`${calculateImpact(
+              <div className={`${calculatePositiveImpact(
                 result.currentMetrics.financialHealth.averageRevenuePerAgent,
                 result.projectedMetrics.financialHealth.averageRevenuePerAgent
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
@@ -62,7 +69,7 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Lifetime Value</div>
               <div>{formatCurrency(result.currentMetrics.financialHealth.lifetimeValue)}</div>
               <div>{formatCurrency(result.projectedMetrics.financialHealth.lifetimeValue)}</div>
-              <div className={`${calculateImpact(
+              <div className={`${calculatePositiveImpact(
                 result.currentMetrics.financialHealth.lifetimeValue,
                 result.projectedMetrics.financialHealth.lifetimeValue
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
@@ -85,9 +92,9 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Churn Risk</div>
               <div>{formatPercentage(result.currentMetrics.earlyWarning.churnPredictionScore)}</div>
               <div>{formatPercentage(result.projectedMetrics.earlyWarning.churnPredictionScore)}</div>
-              <div className={`${calculateImpact(
-                result.projectedMetrics.earlyWarning.churnPredictionScore,
-                result.currentMetrics.earlyWarning.churnPredictionScore
+              <div className={`${calculateNegativeImpact(
+                result.currentMetrics.earlyWarning.churnPredictionScore,
+                result.projectedMetrics.earlyWarning.churnPredictionScore
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
                 {formatImpact(
                   result.currentMetrics.earlyWarning.churnPredictionScore,
@@ -98,13 +105,39 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Engagement</div>
               <div>{formatPercentage(result.currentMetrics.earlyWarning.engagementDeclinePercentage)}</div>
               <div>{formatPercentage(result.projectedMetrics.earlyWarning.engagementDeclinePercentage)}</div>
-              <div className={`${calculateImpact(
-                result.projectedMetrics.earlyWarning.engagementDeclinePercentage,
-                result.currentMetrics.earlyWarning.engagementDeclinePercentage
+              <div className={`${calculateNegativeImpact(
+                result.currentMetrics.earlyWarning.engagementDeclinePercentage,
+                result.projectedMetrics.earlyWarning.engagementDeclinePercentage
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
                 {formatImpact(
                   result.currentMetrics.earlyWarning.engagementDeclinePercentage,
                   result.projectedMetrics.earlyWarning.engagementDeclinePercentage
+                )}
+              </div>
+              
+              <div>Satisfaction</div>
+              <div>{formatPercentage(result.currentMetrics.earlyWarning.satisfactionTrendValue)}</div>
+              <div>{formatPercentage(result.projectedMetrics.earlyWarning.satisfactionTrendValue)}</div>
+              <div className={`${calculatePositiveImpact(
+                result.currentMetrics.earlyWarning.satisfactionTrendValue,
+                result.projectedMetrics.earlyWarning.satisfactionTrendValue
+              ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                {formatImpact(
+                  result.currentMetrics.earlyWarning.satisfactionTrendValue,
+                  result.projectedMetrics.earlyWarning.satisfactionTrendValue
+                )}
+              </div>
+              
+              <div>Price Sensitivity</div>
+              <div>{formatPercentage(result.currentMetrics.earlyWarning.priceSensitivityScore)}</div>
+              <div>{formatPercentage(result.projectedMetrics.earlyWarning.priceSensitivityScore)}</div>
+              <div className={`${calculateNegativeImpact(
+                result.currentMetrics.earlyWarning.priceSensitivityScore,
+                result.projectedMetrics.earlyWarning.priceSensitivityScore
+              ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                {formatImpact(
+                  result.currentMetrics.earlyWarning.priceSensitivityScore,
+                  result.projectedMetrics.earlyWarning.priceSensitivityScore
                 )}
               </div>
             </div>
@@ -121,7 +154,7 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Retention Rate</div>
               <div>{formatPercentage(result.currentMetrics.revenueImpact.revenueRetentionRate)}</div>
               <div>{formatPercentage(result.projectedMetrics.revenueImpact.revenueRetentionRate)}</div>
-              <div className={`${calculateImpact(
+              <div className={`${calculatePositiveImpact(
                 result.currentMetrics.revenueImpact.revenueRetentionRate,
                 result.projectedMetrics.revenueImpact.revenueRetentionRate
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
@@ -134,9 +167,9 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Revenue at Risk</div>
               <div>{formatCurrency(result.currentMetrics.revenueImpact.revenueAtRisk)}</div>
               <div>{formatCurrency(result.projectedMetrics.revenueImpact.revenueAtRisk)}</div>
-              <div className={`${calculateImpact(
-                result.projectedMetrics.revenueImpact.revenueAtRisk,
-                result.currentMetrics.revenueImpact.revenueAtRisk
+              <div className={`${calculateNegativeImpact(
+                result.currentMetrics.revenueImpact.revenueAtRisk,
+                result.projectedMetrics.revenueImpact.revenueAtRisk
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>
                 {formatImpact(
                   result.currentMetrics.revenueImpact.revenueAtRisk,
@@ -147,7 +180,7 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
               <div>Growth Rate</div>
               <div>{formatPercentage(result.currentMetrics.revenueImpact.revenueGrowthRate)}</div>
               <div>{formatPercentage(result.projectedMetrics.revenueImpact.revenueGrowthRate)}</div>
-              <div className={`${calculateImpact(
+              <div className={`${calculatePositiveImpact(
                 result.currentMetrics.revenueImpact.revenueGrowthRate,
                 result.projectedMetrics.revenueImpact.revenueGrowthRate
               ) === 'up' ? 'text-green-600' : 'text-red-600'}`}>

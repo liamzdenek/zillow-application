@@ -33,22 +33,19 @@ export const EarlyWarning: React.FC<EarlyWarningProps> = ({ metrics }) => {
         value={formatPercentage(metrics.engagementDeclinePercentage)}
         trend={getTrend(-metrics.engagementDeclinePercentage)}
         trendValue={formatTrend(-metrics.engagementDeclinePercentage)}
+        trendDescription="Change in engagement decline rate compared to baseline (negative is better)"
       />
       <MetricItem
         label="Satisfaction Trend"
         value={formatPercentage(metrics.satisfactionTrendValue)}
         trend={getTrend(metrics.satisfactionTrendValue)}
         trendValue={formatTrend(metrics.satisfactionTrendValue)}
+        trendDescription="Change in satisfaction trend compared to baseline (positive is better)"
       />
       <MetricItem
         label="Price Sensitivity"
         value={formatPercentage(metrics.priceSensitivityScore)}
       />
-      
-      {/* Placeholder for chart - in a real implementation, we would use Chart.js here */}
-      <div className="mt-4 h-40 bg-zillow-light-blue rounded flex items-center justify-center">
-        <span className="text-zillow-blue">Risk Trend Chart</span>
-      </div>
     </MetricCard>
   );
 };

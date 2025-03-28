@@ -8,6 +8,11 @@
 - Added TanStack Router for navigation between pages
 - Created a custom favicon.svg for the application
 - Fixed build configuration to output to the correct location
+- Fixed UI issues with filter components alignment
+- Fixed simulation endpoint URL in the frontend code
+- Added missing metrics to the simulation results
+- Fixed color highlighting in the simulation results
+- Improved navigation with button-styled links
 
 ### Backend Development
 - Implemented API endpoints for fetching agent data
@@ -48,3 +53,6 @@
 - The frontend and backend build processes need to be configured to output to the correct locations
 - The CDK stack needs to be updated to use the correct paths for the frontend and backend
 - The TanStack Router API has changed in version 1.114.15, requiring updates to the imports
+- For metrics where higher values are better (revenue, satisfaction), use a different color highlighting logic than for metrics where lower values are better (churn, risk)
+- When using filter components, it's important to handle the case when no filter is selected
+- The simulation API returns a subset of metrics compared to the dashboard API, focusing on financial health, early warning, and revenue impact

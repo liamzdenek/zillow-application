@@ -20,24 +20,31 @@ export const MetricItem: React.FC<{
   value: string | number;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string | number;
-}> = ({ label, value, trend, trendValue }) => {
+  trendDescription?: string;
+}> = ({ label, value, trend, trendValue, trendDescription }) => {
   const getTrendColor = () => {
     if (!trend) return '';
-    return trend === 'up' 
-      ? 'text-green-600' 
-      : trend === 'down' 
-        ? 'text-red-600' 
+    return trend === 'up'
+      ? 'text-green-600'
+      : trend === 'down'
+        ? 'text-red-600'
         : 'text-gray-600';
   };
 
   const getTrendIcon = () => {
     if (!trend) return null;
-    return trend === 'up' 
-      ? '↑' 
-      : trend === 'down' 
-        ? '↓' 
+    return trend === 'up'
+      ? '↑'
+      : trend === 'down'
+        ? '↓'
         : '→';
   };
+
+  const defaultDescription = trend === 'up'
+    ? 'Change from baseline (higher is better)'
+    : trend === 'down'
+      ? 'Change from baseline (lower is better)'
+      : 'No change from baseline';
 
   return (
     <div className="flex justify-between items-baseline">
@@ -45,8 +52,13 @@ export const MetricItem: React.FC<{
       <div className="flex items-baseline space-x-2">
         <div className="text-xl font-semibold">{value}</div>
         {trend && trendValue && (
-          <div className={`text-sm ${getTrendColor()}`}>
-            {getTrendIcon()} {trendValue}
+          <div className="relative group">
+            <div className={`text-sm ${getTrendColor()}`}>
+              {getTrendIcon()} {trendValue}
+            </div>
+            <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
+              {trendDescription || defaultDescription}
+            </div>
           </div>
         )}
       </div>

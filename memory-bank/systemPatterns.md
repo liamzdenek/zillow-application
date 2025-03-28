@@ -92,6 +92,64 @@ The simulation functionality is implemented on a separate page rather than integ
 
 ## Design Patterns
 
+### UI Patterns
+
+#### Metric Display Pattern
+The dashboard implements a consistent pattern for displaying metrics:
+```typescript
+// Example metric display pattern
+interface MetricDisplayProps {
+  label: string;
+  value: string | number;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string | number;
+  trendDescription?: string;
+}
+
+const MetricDisplay: React.FC<MetricDisplayProps> = ({
+  label, value, trend, trendValue, trendDescription
+}) => {
+  // Implementation to display a metric with its trend
+};
+```
+
+#### Conditional Color Highlighting
+The application uses different color highlighting logic based on whether higher or lower values are better for a particular metric:
+```typescript
+// For metrics where higher values are better (revenue, satisfaction)
+const calculatePositiveImpact = (current: number, projected: number) => {
+  const difference = projected - current;
+  return difference > 0 ? 'up' : difference < 0 ? 'down' : 'neutral';
+};
+
+// For metrics where lower values are better (churn, risk)
+const calculateNegativeImpact = (current: number, projected: number) => {
+  const difference = projected - current;
+  return difference < 0 ? 'up' : difference > 0 ? 'down' : 'neutral';
+};
+```
+
+#### Filter State Management
+The application implements a two-stage filter state management pattern:
+```typescript
+// Example filter state management
+interface FilterState {
+  // Applied filters (used for data fetching)
+  segmentType?: string;
+  segmentValue?: string;
+  
+  // Pending filters (UI state before applying)
+  pendingSegmentType?: string;
+  pendingSegmentValue?: string;
+  
+  // Actions
+  setSegmentType: (type?: string) => void;
+  setSegmentValue: (value?: string) => void;
+  applyFilters: () => void;
+  resetFilters: () => void;
+}
+```
+
 ### Repository Pattern
 The backend implements a repository pattern to abstract data access:
 ```typescript
@@ -235,6 +293,8 @@ class ApiClient {
     segmentType: string,
     segmentValue: string
   ): Promise<SimulationResult> {
+    // Note: The API endpoint is '/api/simulate', not '/simulation'
+    // The simulation API returns a subset of metrics compared to the dashboard API
     const response = await fetch('/api/simulate', {
       method: 'POST',
       headers: {
@@ -294,6 +354,9 @@ While this is a one-day project with a limited dataset (500 agents), the archite
 1. **Frontend Scalability**
    - CloudFront distribution ensures global availability and caching
    - React application can be optimized for performance with code splitting and lazy loading
+   - Filter components are designed to handle different states gracefully
+   - Simulation results display is optimized to show only the relevant metrics
+   - Color highlighting logic is abstracted to handle different types of metrics
 
 2. **Backend Scalability**
    - Lambda functions automatically scale based on demand
@@ -309,3 +372,6 @@ While this is a one-day project with a limited dataset (500 agents), the archite
      - Pre-computed aggregations for common segments
      - More sophisticated caching strategies
      - Potentially a data warehouse for complex analytics
+     - More interactive visualizations for the simulation results
+     - Improved mobile responsiveness for the dashboard
+     - Enhanced error handling and user feedback mechanisms
