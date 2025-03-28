@@ -1,0 +1,21 @@
+{
+  "version": "6.0",
+  "nxVersion": "20.6.2",
+  "pathMappings": {},
+  "nxJsonPlugins": [],
+  "fileMap": {
+    "projectFileMap": {
+      "zillow-application": [
+        {
+          "file": "nx.json",
+          "hash": "14443875240832808589"
+        },
+        {
+          "file": "package.json",
+          "hash": "4137321380863563998"
+        }
+      ]
+    },
+    "nonProjectFiles": []
+  }
+}
