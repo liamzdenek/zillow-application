@@ -23,7 +23,17 @@
         "command": "cdk bootstrap",
         "cwd": "packages/cdk"
       },
-      "dependsOn": ["build"]
+      "dependsOn": [
+        "build",
+        {
+          "projects": ["backend"],
+          "target": "build"
+        },
+        {
+          "projects": ["frontend"],
+          "target": "build"
+        }
+      ]
     },
     "deploy": {
       "executor": "nx:run-commands",

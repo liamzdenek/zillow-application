@@ -37,7 +37,7 @@ export const Simulation: React.FC = () => {
   const canSimulate = !!segmentType && !!segmentValue && !!interventionType;
 
   return (
-    <Layout>
+    <>
       <div className="mb-6">
         <Link to="/" className="text-zillow-blue hover:underline mb-4 inline-block">
           &lt; Back to Dashboard
@@ -106,6 +106,6 @@ export const Simulation: React.FC = () => {
           </div>
         </>
       )}
-    </Layout>
+    </>
   );
 };

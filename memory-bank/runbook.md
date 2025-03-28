@@ -1,375 +1,119 @@
-# Runbook: Zillow Real Estate Professional Health Dashboard
+# Runbook
 
-This runbook provides procedures for common operational tasks related to the Zillow Real Estate Professional Health Dashboard. It follows the Validate, Triage, Act, Reflect (VTAR) approach for troubleshooting issues.
+This document provides procedures for debugging, deploying, monitoring, and troubleshooting the Zillow Real Estate Professional Health Dashboard.
 
-## Development Procedures
+## Procedures
 
-### Setting Up the Development Environment
+### Validate
 
-#### Prerequisites
-- Node.js (v16 or later)
-- npm (v7 or later)
-- AWS CLI configured with appropriate credentials
-- AWS CDK installed globally (`npm install -g aws-cdk`)
+#### Validating the Frontend
+1. Access the CloudFront URL: https://d1lm2ezci363i3.cloudfront.net
+2. Verify that the dashboard loads and displays data
+3. Test filtering by different segments
+4. Test the simulation functionality
 
-#### Initial Setup
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd zillow-application
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Build all packages:
-   ```bash
-   nx run-many --target=build --all
-   ```
-
-### Local Development
-
-Remember that we're not using local mocks - we deploy to AWS for testing. However, you can build and validate code locally:
-
-1. Build a specific package:
-   ```bash
-   nx run frontend:build
-   ```
-
-2. Lint a specific package:
-   ```bash
-   nx run frontend:lint
-   ```
-
-3. Test a specific package:
-   ```bash
-   nx run frontend:test
-   ```
-
-## Deployment Procedures
-
-### Initial Deployment
-
-1. Ensure AWS credentials are configured:
-   ```bash
-   aws configure
-   ```
-
-2. Build all packages:
-   ```bash
-   nx run-many --target=build --all
-   ```
-
-3. Deploy the CDK stack:
-   ```bash
-   nx run cdk:deploy
-   ```
-
-4. Generate and load sample data:
-   ```bash
-   nx run data-generator:generate
-   ```
-
-### Updating the Deployment
-
-#### Frontend Updates
-
-1. Build the frontend:
-   ```bash
-   nx run frontend:build
-   ```
-
-2. Deploy via CDK (which will update S3 and invalidate CloudFront):
-   ```bash
-   nx run cdk:deploy
-   ```
-
-#### Backend Updates
-
-1. Build the backend:
-   ```bash
-   nx run backend:build
-   ```
-
-2. Deploy via CDK (which will update the Lambda function):
-   ```bash
-   nx run cdk:deploy
-   ```
-
-#### Infrastructure Updates
-
-1. Make changes to the CDK code in `packages/cdk/lib/`
-
-2. Deploy the updated stack:
-   ```bash
-   nx run cdk:deploy
-   ```
-
-### Rollback Procedure
-
-If a deployment causes issues:
-
-1. Identify the last known good deployment in CloudFormation:
-   ```bash
-   aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE UPDATE_COMPLETE
-   ```
-
-2. Roll back to the previous version:
-   ```bash
-   aws cloudformation continue-update-rollback --stack-name ZillowDashboardDevStack
-   ```
-
-## Monitoring Procedures
-
-### Checking API Health
-
-1. Use the health check endpoint:
-   ```bash
-   curl https://[api-id].execute-api.[region].amazonaws.com/prod/health
-   ```
-
-2. Expected response:
-   ```json
-   {
-     "status": "healthy",
-     "dependencies": {
-       "dynamodb": "connected"
-     },
-     "timestamp": "2025-03-28T13:45:30.123Z"
-   }
-   ```
-
-### Viewing Lambda Logs
-
-1. View recent logs:
-   ```bash
-   aws cloudwatch logs get-log-events --log-group-name /aws/lambda/ZillowDashboardDevApiFunction
-   ```
-
-2. Wait for logs to propagate after an action:
-   ```bash
-   sleep 10 && aws cloudwatch logs get-log-events --log-group-name /aws/lambda/ZillowDashboardDevApiFunction
-   ```
-
-3. Filter logs for errors:
-   ```bash
-   aws logs filter-log-events --log-group-name /aws/lambda/ZillowDashboardDevApiFunction --filter-pattern "ERROR"
-   ```
-
-### Checking DynamoDB Status
-
-1. Verify table exists:
-   ```bash
-   aws dynamodb describe-table --table-name ZillowDashboardDevAgentsTable
-   ```
-
-2. Check item count:
-   ```bash
-   aws dynamodb scan --table-name ZillowDashboardDevAgentsTable --select COUNT
-   ```
-
-3. Sample a few items:
-   ```bash
-   aws dynamodb scan --table-name ZillowDashboardDevAgentsTable --limit 5
-   ```
-
-## Troubleshooting Guide
-
-### VTAR Process
-
-For all issues, follow the Validate, Triage, Act, Reflect process:
-
-1. **Validate**: Confirm the issue exists and gather information
-2. **Triage**: Determine the severity and potential causes
-3. **Act**: Implement a solution
-4. **Reflect**: Document findings and prevent future occurrences
-
-### Common Issues
-
-#### API Returns 5xx Errors
-
-**Validate**:
-1. Confirm the error with curl:
-   ```bash
-   curl -v https://[api-id].execute-api.[region].amazonaws.com/prod/metrics
-   ```
-2. Check Lambda logs:
-   ```bash
-   aws cloudwatch logs get-log-events --log-group-name /aws/lambda/ZillowDashboardDevApiFunction
-   ```
-
-**Triage**:
-- If logs show DynamoDB access errors, check IAM permissions
-- If logs show code exceptions, identify the specific error
-
-**Act**:
-- For permission issues:
-  ```bash
-  # Check the IAM role
-  aws iam get-role --role-name ZillowDashboardDevLambdaRole
-  
-  # Update the role if needed via CDK and redeploy
-  nx run cdk:deploy
-  ```
-- For code issues:
-  1. Fix the code
-  2. Rebuild and redeploy:
-     ```bash
-     nx run backend:build
-     nx run cdk:deploy
-     ```
-
-**Reflect**:
-- Document the issue and solution
-- Add better error handling if needed
-- Consider adding CloudWatch alarms for this type of error
-
-#### Frontend Not Loading or Showing Outdated Content
-
-**Validate**:
-1. Check the CloudFront URL in a browser
-2. Inspect browser console for errors
-3. Verify S3 bucket contents:
-   ```bash
-   aws s3 ls s3://zillow-dashboard-dev-frontend/
-   ```
-
-**Triage**:
-- If S3 is empty or missing files, deployment failed
-- If content exists but is outdated, CloudFront cache issue
-- If console shows API errors, backend issue
-
-**Act**:
-- For missing files:
-  ```bash
-  nx run frontend:build
-  aws s3 sync dist/packages/frontend s3://zillow-dashboard-dev-frontend
-  ```
-- For cache issues:
-  ```bash
-  aws cloudfront create-invalidation --distribution-id [distribution-id] --paths "/*"
-  ```
-
-**Reflect**:
-- Ensure deployment process includes cache invalidation
-- Add deployment verification steps
-
-#### No Data or Incorrect Data Showing in Dashboard
-
-**Validate**:
-1. Check API response:
-   ```bash
-   curl https://[api-id].execute-api.[region].amazonaws.com/prod/metrics
-   ```
-2. Verify DynamoDB data:
-   ```bash
-   aws dynamodb scan --table-name ZillowDashboardDevAgentsTable --limit 5
-   ```
-
-**Triage**:
-- If DynamoDB is empty, data generation failed
-- If data exists but API returns empty/wrong results, backend processing issue
-
-**Act**:
-- For empty DynamoDB:
-  ```bash
-  nx run data-generator:generate
-  ```
-- For backend processing issues:
-  1. Debug the aggregation logic
-  2. Fix, rebuild, and redeploy:
-     ```bash
-     nx run backend:build
-     nx run cdk:deploy
-     ```
-
-**Reflect**:
-- Add data validation to the data generator
-- Improve error handling in the backend
-
-#### CDK Deployment Failures
-
-**Validate**:
-1. Check CloudFormation events:
-   ```bash
-   aws cloudformation describe-stack-events --stack-name ZillowDashboardDevStack
-   ```
-
-**Triage**:
-- Identify the specific resource causing the failure
-- Check for permission issues or configuration errors
-
-**Act**:
-- For permission issues, update AWS credentials or IAM roles
-- For configuration errors, fix CDK code and redeploy
-- If stack is in a failed state:
-  ```bash
-  aws cloudformation delete-stack --stack-name ZillowDashboardDevStack
-  # Then redeploy
-  nx run cdk:deploy
-  ```
-
-**Reflect**:
-- Add pre-deployment validation
-- Consider using CDK diff to preview changes
-
-## Maintenance Procedures
-
-### Backing Up DynamoDB Data
-
+#### Validating the Backend
+1. Test the API directly using curl or Postman:
 ```bash
-aws dynamodb export-table-to-point-in-time \
-  --table-name ZillowDashboardDevAgentsTable \
-  --s3-bucket [backup-bucket] \
-  --s3-prefix [backup-prefix] \
-  --export-format DYNAMODB_JSON
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/agents
+```
+2. Verify that the API returns the expected data
+3. Test filtering by different segments:
+```bash
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/agents?segment=experienceLevel&value=Experienced
+```
+4. Test the simulation endpoint:
+```bash
+curl -X POST https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/simulate -H "Content-Type: application/json" -d '{"segment": "experienceLevel", "value": "Experienced", "metric": "conversionRate", "change": 0.1}'
 ```
 
-### Refreshing Sample Data
+### Triage
 
+#### Frontend Issues
+1. Check the browser console for errors
+2. Verify that the API requests are being made correctly
+3. Check that the CloudFront distribution is configured correctly
+4. Verify that the S3 bucket contains the expected files
+
+#### Backend Issues
+1. Check the CloudWatch Logs for the Lambda function
+2. Verify that the Lambda function has the correct permissions to access DynamoDB
+3. Check that the API Gateway is configured correctly
+4. Verify that the DynamoDB table contains data
+
+#### Infrastructure Issues
+1. Check the CloudFormation stack status
+2. Verify that all resources were created successfully
+3. Check the IAM permissions for each resource
+
+### Act
+
+#### Deploying Updates
+1. Build the frontend and backend:
 ```bash
-# Clear existing data
-aws dynamodb delete-table --table-name ZillowDashboardDevAgentsTable
-
-# Wait for table deletion to complete
-aws dynamodb wait table-not-exists --table-name ZillowDashboardDevAgentsTable
-
-# Redeploy to recreate the table
-nx run cdk:deploy
-
-# Wait for table creation to complete
-aws dynamodb wait table-exists --table-name ZillowDashboardDevAgentsTable
-
-# Generate new data
-nx run data-generator:generate
+npx nx build frontend
+npx nx build backend
+```
+2. Deploy the CDK stack:
+```bash
+AWS_PROFILE=lz-demos AWS_REGION=us-west-2 npx nx run cdk:deploy
 ```
 
-### Cleaning Up Resources
-
-When the project is no longer needed:
-
+#### Populating the Database
+1. Set the table name from the CDK output:
 ```bash
-# Delete the CloudFormation stack
-aws cloudformation delete-stack --stack-name ZillowDashboardDevStack
-
-# Verify deletion
-aws cloudformation describe-stacks --stack-name ZillowDashboardDevStack
-# Should return "Stack with id ZillowDashboardDevStack does not exist"
+export AGENTS_TABLE_NAME=ZillowDashboardStack-ZillowAgents5D2BFE9D-14YRSJUD4FKTE
+```
+2. Run the data generator:
+```bash
+AWS_PROFILE=lz-demos AWS_REGION=us-west-2 npx nx run data-generator:generate
 ```
 
-## Operational Learnings
+#### Cleaning Up
+1. Destroy the CDK stack:
+```bash
+AWS_PROFILE=lz-demos AWS_REGION=us-west-2 npx nx run cdk:destroy
+```
 
-As this is a new project, we'll document operational learnings here as they occur:
+### Reflect
 
-1. **Always wait for CloudWatch logs**: There's a delay between Lambda execution and log availability. Always use `sleep 10 && [command]` when checking logs after an action.
+After each operation, reflect on the following:
+1. What went well?
+2. What could be improved?
+3. Are there any patterns or issues that need to be addressed?
+4. Are there any changes needed to the documentation or procedures?
 
-2. **Clean build artifacts before rebuilding**: To avoid issues with stale artifacts, always clean the dist directory before rebuilding: `rm -rf dist && nx run-many --target=build --all`
+## Common Issues
 
-3. **Verify DynamoDB data after generation**: Always check that data was properly loaded with the expected structure and count.
+### Error: Cannot find asset at /home/q/WebstormProjects/zillow-application/packages/backend/dist
+**Root Cause**: The backend build output is not in the expected location.
+**Solution**: Update the CDK stack to use the correct path:
+```typescript
+const BACKEND_PATH = path.join(GIT_ROOT, 'dist/packages/backend');
+```
 
-4. **Check CloudFront cache**: Remember that CloudFront caching can cause outdated content to be served. Always invalidate the cache after frontend updates.
+### Error: Cannot find asset at /home/q/WebstormProjects/zillow-application/packages/frontend/dist
+**Root Cause**: The frontend build output is not in the expected location.
+**Solution**: Update the vite.config.ts file to build to the correct location:
+```typescript
+build: {
+  outDir: '../../dist/packages/frontend',
+  emptyOutDir: true,
+},
+```
 
-5. **Use the health check endpoint**: The health check endpoint provides a quick way to verify that the entire stack is functioning correctly.
+### Error: Module '"@tanstack/react-router"' has no exported member 'Outlet'
+**Root Cause**: The TanStack Router API has changed in version 1.114.15.
+**Solution**: Update the imports to use the correct API:
+```typescript
+import { createRootRoute, Link, Outlet } from '@tanstack/react-router/dist/esm';
+```
+
+### Error: CORS policy: No 'Access-Control-Allow-Origin' header
+**Root Cause**: The API Gateway CORS configuration is incorrect.
+**Solution**: Update the API Gateway CORS configuration in the CDK stack:
+```typescript
+defaultCorsPreflightOptions: {
+  allowOrigins: apigateway.Cors.ALL_ORIGINS,
+  allowMethods: apigateway.Cors.ALL_METHODS
+}

@@ -13,7 +13,7 @@ export const Dashboard: React.FC = () => {
   const { applyFilters, resetFilters } = useFilter();
 
   return (
-    <Layout>
+    <>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Zillow Real Estate Professional Health Dashboard</h1>
         
@@ -85,6 +85,6 @@ export const Dashboard: React.FC = () => {
           No data available. Please check your filters or try again later.
         </div>
       )}
-    </Layout>
+    </>
   );
 };

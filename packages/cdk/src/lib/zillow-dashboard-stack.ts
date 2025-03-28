@@ -7,6 +7,40 @@ import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
+import * as path from 'path';
+import * as fs from 'fs';
+
+// Find the git root directory
+function findGitRoot(startPath: string): string {
+  let currentPath = startPath;
+  while (currentPath !== '/') {
+    if (fs.existsSync(path.join(currentPath, '.git'))) {
+      return currentPath;
+    }
+    currentPath = path.dirname(currentPath);
+  }
+  throw new Error('Git root directory not found');
+}
+
+// Validate that a path exists and is not empty
+function validatePath(pathToCheck: string, description: string): void {
+  if (!fs.existsSync(pathToCheck)) {
+    throw new Error(`${description} path does not exist: ${pathToCheck}`);
+  }
+  
+  const stats = fs.statSync(pathToCheck);
+  if (stats.isDirectory() && fs.readdirSync(pathToCheck).length === 0) {
+    throw new Error(`${description} directory is empty: ${pathToCheck}`);
+  }
+}
+
+const GIT_ROOT = findGitRoot(__dirname);
+const BACKEND_PATH = path.join(GIT_ROOT, 'dist/packages/backend');
+const FRONTEND_PATH = path.join(GIT_ROOT, 'dist/packages/frontend');
+
+// Validate paths
+validatePath(BACKEND_PATH, 'Backend');
+validatePath(FRONTEND_PATH, 'Frontend');
 
 export class ZillowDashboardStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -66,7 +100,7 @@ export class ZillowDashboardStack extends cdk.Stack {
     const backendFunction = new lambda.Function(this, 'BackendFunction', {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'main.handler',
-      code: lambda.Code.fromAsset('../backend/dist'),
+      code: lambda.Code.fromAsset(BACKEND_PATH),
       environment: {
         AGENTS_TABLE_NAME: agentsTable.tableName
       }
@@ -139,7 +173,7 @@ export class ZillowDashboardStack extends cdk.Stack {
 
     // Deploy frontend to S3
     new s3deploy.BucketDeployment(this, 'DeployFrontend', {
-      sources: [s3deploy.Source.asset('../frontend/dist')],
+      sources: [s3deploy.Source.asset(FRONTEND_PATH)],
       destinationBucket: frontendBucket,
       distribution,
       distributionPaths: ['/*']

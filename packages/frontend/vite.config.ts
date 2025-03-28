@@ -15,6 +15,10 @@ export default defineConfig({
       'shared': path.resolve(__dirname, '../../packages/shared/src/index.ts')
     },
   },
+  build: {
+    outDir: '../../dist/packages/frontend',
+    emptyOutDir: true,
+  },
   server: {
     port: 3000,
     proxy: {
