@@ -16,6 +16,40 @@
         "format": ["cjs"],
         "generatePackageJson": true
       }
+    },
+    "bootstrap": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cdk bootstrap",
+        "cwd": "packages/cdk"
+      },
+      "dependsOn": ["build"]
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cdk deploy",
+        "cwd": "packages/cdk"
+      },
+      "dependsOn": [
+        "build",
+        {
+          "projects": ["backend"],
+          "target": "build"
+        },
+        {
+          "projects": ["frontend"],
+          "target": "build"
+        }
+      ]
+    },
+    "destroy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "cdk destroy",
+        "cwd": "packages/cdk"
+      },
+      "dependsOn": ["build"]
     }
   }
 }

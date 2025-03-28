@@ -1,29 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { AppProvider } from './context/AppProvider';
-import { Dashboard } from './pages/Dashboard';
-import { Simulation } from './pages/Simulation';
 import './styles.css';
 
-// Define routes
-const rootRoute = createRootRoute();
+// Import the generated route tree
+import { routeTree } from './routeTree.gen';
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: Dashboard
-});
-
-const simulationRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/simulation',
-  component: Simulation
-});
-
-// Create router
-const routeTree = rootRoute.addChildren([indexRoute, simulationRoute]);
+// Create a new router instance
 const router = createRouter({ routeTree });
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

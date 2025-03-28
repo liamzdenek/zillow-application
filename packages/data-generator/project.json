@@ -53,6 +53,14 @@
           "buildTarget": "data-generator:build:production"
         }
       }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "node dist/packages/data-generator/main.js",
+        "cwd": "."
+      },
+      "dependsOn": ["build"]
     }
   }
 }
