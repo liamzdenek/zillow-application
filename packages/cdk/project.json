@@ -27,7 +27,7 @@
         "build",
         {
           "projects": ["backend"],
-          "target": "build"
+          "target": "build-with-dependencies"
         },
         {
           "projects": ["frontend"],
@@ -45,7 +45,7 @@
         "build",
         {
           "projects": ["backend"],
-          "target": "build"
+          "target": "build-with-dependencies"
         },
         {
           "projects": ["frontend"],

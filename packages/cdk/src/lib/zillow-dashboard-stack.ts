@@ -103,7 +103,9 @@ export class ZillowDashboardStack extends cdk.Stack {
       code: lambda.Code.fromAsset(BACKEND_PATH),
       environment: {
         AGENTS_TABLE_NAME: agentsTable.tableName
-      }
+      },
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 1024
     });
 
     // Grant the Lambda function read/write access to the DynamoDB table

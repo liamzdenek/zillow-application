@@ -15,16 +15,24 @@ This document provides procedures for debugging, deploying, monitoring, and trou
 #### Validating the Backend
 1. Test the API directly using curl or Postman:
 ```bash
-curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/agents
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/health
 ```
 2. Verify that the API returns the expected data
-3. Test filtering by different segments:
+3. Test the metrics endpoint:
 ```bash
-curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/agents?segment=experienceLevel&value=Experienced
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/metrics
 ```
-4. Test the simulation endpoint:
+4. Test the segments endpoint:
 ```bash
-curl -X POST https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/simulate -H "Content-Type: application/json" -d '{"segment": "experienceLevel", "value": "Experienced", "metric": "conversionRate", "change": 0.1}'
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/segments
+```
+5. Test the interventions endpoint:
+```bash
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/interventions
+```
+6. Test the simulation endpoint:
+```bash
+curl -X POST https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/simulate -H "Content-Type: application/json" -d '{"interventionType":"discount-offer","segmentType":"experienceLevel","segmentValue":"rookie"}'
 ```
 
 ### Triage
@@ -52,7 +60,7 @@ curl -X POST https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/simulat
 1. Build the frontend and backend:
 ```bash
 npx nx build frontend
-npx nx build backend
+npx nx run backend:build-with-dependencies
 ```
 2. Deploy the CDK stack:
 ```bash
@@ -117,3 +125,46 @@ defaultCorsPreflightOptions: {
   allowOrigins: apigateway.Cors.ALL_ORIGINS,
   allowMethods: apigateway.Cors.ALL_METHODS
 }
+```
+
+### Error: Cannot find module 'express'
+**Root Cause**: The Lambda function is missing dependencies.
+**Solution**: Update the backend build process to include dependencies:
+```json
+"install-dependencies": {
+  "executor": "nx:run-commands",
+  "options": {
+    "command": "cd dist/packages/backend && npm install --production",
+    "cwd": "."
+  },
+  "dependsOn": ["build"]
+},
+"build-with-dependencies": {
+  "executor": "nx:run-commands",
+  "options": {
+    "commands": [
+      "nx build backend",
+      "nx run backend:install-dependencies"
+    ],
+    "parallel": false
+  }
+}
+```
+
+### Error: Task timed out after 3.07 seconds
+**Root Cause**: The Lambda function is taking too long to execute.
+**Solution**: Increase the Lambda function timeout and memory:
+```typescript
+timeout: cdk.Duration.seconds(30),
+memorySize: 1024
+```
+
+### Error: Cannot GET /agents
+**Root Cause**: The API endpoints are prefixed with /api in the backend code.
+**Solution**: Use the correct API paths:
+```bash
+# Correct
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/health
+
+# Incorrect
+curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/agents

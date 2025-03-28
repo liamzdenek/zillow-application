@@ -17,6 +17,15 @@
 | Frontend | https://d1lm2ezci363i3.cloudfront.net | The main application URL |
 | API | https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/ | The backend API URL |
 
+### API Endpoints
+| Endpoint | Method | Description | Example |
+|----------|--------|-------------|---------|
+| /api/health | GET | Health check endpoint | `curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/health` |
+| /api/metrics | GET | Get metrics data | `curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/metrics` |
+| /api/segments | GET | Get available segments | `curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/segments` |
+| /api/interventions | GET | Get available interventions | `curl https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/interventions` |
+| /api/simulate | POST | Simulate an intervention | `curl -X POST https://fdf213jq7b.execute-api.us-west-2.amazonaws.com/prod/api/simulate -H "Content-Type: application/json" -d '{"interventionType":"discount-offer","segmentType":"experienceLevel","segmentValue":"rookie"}'` |
+
 ## Relationship to Source Code
 
 ### Frontend
