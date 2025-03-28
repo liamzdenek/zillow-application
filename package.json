@@ -1,15 +1,79 @@
 {
   "name": "zillow-application",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Zillow Real Estate Professional Health Dashboard",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nx run-many --target=serve --all",
+    "build": "nx run-many --target=build --all",
+    "test": "nx run-many --target=test --all",
+    "lint": "nx run-many --target=lint --all",
+    "clean": "rm -rf dist && echo 'Build artifacts cleaned'"
   },
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
-    "nx": "20.6.2"
+    "@nx/esbuild": "20.6.4",
+    "@nx/eslint": "20.6.4",
+    "@nx/eslint-plugin": "20.6.4",
+    "@nx/jest": "^20.6.2",
+    "@nx/js": "20.6.4",
+    "@nx/node": "20.6.4",
+    "@nx/react": "20.6.4",
+    "@nx/vite": "20.6.4",
+    "@nx/web": "20.6.4",
+    "@nx/webpack": "^20.6.2",
+    "@swc-node/register": "~1.9.1",
+    "@swc/cli": "~0.3.12",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@types/react": "18.3.1",
+    "@types/react-dom": "18.3.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "@vitest/ui": "^3.0.0",
+    "esbuild": "^0.19.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jsx-a11y": "6.10.1",
+    "eslint-plugin-react": "7.35.0",
+    "eslint-plugin-react-hooks": "5.0.0",
+    "jest": "^29.7.0",
+    "jiti": "2.4.2",
+    "jsdom": "~22.1.0",
+    "jsonc-eslint-parser": "^2.1.0",
+    "nx": "20.6.2",
+    "prettier": "^2.6.2",
+    "ts-jest": "^29.1.2",
+    "tslib": "^2.3.0",
+    "typescript": "^5.4.2",
+    "vite": "^6.0.0",
+    "vitest": "^3.0.0"
   },
-  "nx": {}
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.777.0",
+    "@aws-sdk/lib-dynamodb": "^3.777.0",
+    "@tanstack/react-router": "^1.114.29",
+    "aws-cdk-lib": "^2.186.0",
+    "chart.js": "^4.4.8",
+    "constructs": "^10.4.2",
+    "date-fns": "^3.6.0",
+    "express": "^4.21.2",
+    "react": "18.3.1",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "18.3.1",
+    "serverless-http": "^3.2.0",
+    "zod": "^3.24.2"
+  },
+  "nx": {
+    "includedScripts": []
+  }
 }

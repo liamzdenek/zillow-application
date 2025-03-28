@@ -1,0 +1,21 @@
+{
+  "name": "cdk",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/cdk/src",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@nx/esbuild:esbuild",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/cdk",
+        "main": "packages/cdk/src/index.ts",
+        "tsConfig": "packages/cdk/tsconfig.lib.json",
+        "assets": ["packages/cdk/*.md"],
+        "format": ["cjs"],
+        "generatePackageJson": true
+      }
+    }
+  }
+}
