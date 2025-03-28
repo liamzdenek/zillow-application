@@ -102,7 +102,7 @@ export const SimulationResults: React.FC<SimulationResultsProps> = ({ result }) 
                 )}
               </div>
               
-              <div>Engagement</div>
+              <div>Engagement Decline</div>
               <div>{formatPercentage(result.currentMetrics.earlyWarning.engagementDeclinePercentage)}</div>
               <div>{formatPercentage(result.projectedMetrics.earlyWarning.engagementDeclinePercentage)}</div>
               <div className={`${calculateNegativeImpact(
