@@ -1,0 +1,20 @@
+{
+  "name": "data-generator",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./src/main.js",
+  "scripts": {
+    "build": "nx build",
+    "generate": "node dist/packages/data-generator/main.js",
+    "generate:dev": "nx build && node dist/packages/data-generator/main.js"
+  },
+  "dependencies": {
+    "shared": "*",
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws-sdk/lib-dynamodb": "^3.515.0",
+    "faker": "^5.5.3"
+  },
+  "devDependencies": {
+    "@types/faker": "^5.5.9"
+  }
+}
